@@ -7,14 +7,18 @@ interface IClient {
     client: mysql.Connection;
 }
 
+interface IOptions {
+    expiration?: number;
+}
+
 class Client {
     private type: ClientTypes;
     private client: mysql.Connection;
-    private tableName: string = 'kvstore-keyvalues';
+    private tableName: string = 'kvstore_keyvalues';
 
     /**
      * Initiates the package, after run this function you will be able to run the other functions
-     * 
+     *
      * @param  {IClient} params
      * @returns Promise
      */
@@ -30,21 +34,42 @@ class Client {
 
     /**
      * Inserts or updates a value with a key
-     * 
+     *
      * @param  {string} key
      * @param  {string} value
+     * @param  {IOptions} options?
      * @returns Promise
      */
-    public async put(key: string, value: string): Promise<Boolean> {
+    public async put(key: string, value: string, options?: IOptions): Promise<Boolean> {
+
         switch (this.type) {
-        case 'mysql':
+        case 'mysql': {
+            if (options && options.expiration) {
+                this.expireMysql(key, options.expiration);
+            }
+
             return this.putMysql(key, value);
+        }
         }
     }
 
     /**
+     * Inserts or updates a Json value with a key
+     *
+     * @param  {string} key
+     * @param  {string} value
+     * @param  {IOptions} options?
+     * @returns Promise
+     */
+    public async putJson(key: string, value: object, options?: IOptions): Promise<Boolean> {
+        const valueJson = JSON.stringify(value);
+
+        return this.put(key, valueJson, options);
+    }
+
+    /**
      * Gets value based on the key provided (or it can returns null if nothing has been found)
-     * 
+     *
      * @param  {string} key
      * @returns Promise
      */
@@ -57,7 +82,7 @@ class Client {
 
     /**
      * Gets value on JSON format based on the key provided (or it can returns null if nothing has been found)
-     * 
+     *
      * @param  {string} key
      * @returns Promise
      */
@@ -91,10 +116,11 @@ class Client {
     }
 
     private async getMysql(key: string): Promise<string | null> {
-        console.log('test');
+        const keyEscaped = key.replace("'", "\\'");
+
         return new Promise<string | null>((resolve, reject) => {
-            const selectQuery = `SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${key}';`;
-            
+            const selectQuery = `SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${keyEscaped}';`;
+
             this.client.query(selectQuery, (error, results) => {
                 if (error) {
                     return reject(error);
@@ -110,8 +136,11 @@ class Client {
     }
 
     private async putMysql(key: string, value: string): Promise<Boolean> {
+        const keyEscaped = key.replace("'", "\\'");
+        const valueEscaped = value.replace("'", "\\'");
+
         return new Promise<Boolean>((resolve, reject) => {
-            const insertQuery = `INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`) VALUES ('${key}','${value}') ON DUPLICATE KEY UPDATE \`${this.tableName}\`.value = '${value}';`;
+            const insertQuery = `INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`) VALUES ('${keyEscaped}', '${valueEscaped}') ON DUPLICATE KEY UPDATE \`${this.tableName}\`.value = '${valueEscaped}';`;
 
             this.client.query(insertQuery, (error) => {
                 if (error) {
@@ -119,6 +148,33 @@ class Client {
                 }
 
                 return resolve(true);
+            });
+        });
+    }
+
+    private async expireMysql(key: string, expiration: number): Promise<string | null> {
+        const keyEscaped = key.replace("'", "\\'");
+
+        return new Promise<string | null>((resolve, reject) => {
+            const scheduledEventQuery = `
+                DROP EVENT IF EXISTS \`${this.tableName}_${keyEscaped}\`;
+                CREATE EVENT \`${this.tableName}_${keyEscaped}\`
+                ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL ${expiration} SECOND
+                ON COMPLETION NOT PRESERVE
+                DO
+                    DELETE FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${keyEscaped}';
+            `;
+
+            this.client.query(scheduledEventQuery, (error, results) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                if (Array.isArray(results) && results.length > 0) {
+                    return resolve(results[0].value);
+                }
+
+                return resolve(null);
             });
         });
     }

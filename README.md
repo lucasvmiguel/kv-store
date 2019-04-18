@@ -30,7 +30,8 @@ await kvStore.init({
 await kvStore.put('USER:123', 'abc');
 const abc = await kvStore.get('USER:123');
 
-await kvStore.put('USER:456', `{"foo": "bar"}`);
+// Expiration in seconds
+await kvStore.put('USER:456', `{"foo": "bar"}`, { expiration: 60 });
 const fooBar = await kvStore.getJson('USER:456');
 ```
 
