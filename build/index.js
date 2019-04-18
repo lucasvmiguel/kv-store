@@ -145,22 +145,25 @@ class Client {
         return __awaiter(this, void 0, void 0, function* () {
             const keyEscaped = key.replace("'", "\\'");
             return new Promise((resolve, reject) => {
-                const scheduledEventQuery = `
-                DROP EVENT IF EXISTS \`${this.tableName}_${keyEscaped}\`;
-                CREATE EVENT \`${this.tableName}_${keyEscaped}\`
+                const eventName = `${this.tableName}_${keyEscaped}`;
+                const deleteEventQuery = `DROP EVENT IF EXISTS \`${eventName}\`;`;
+                const createEventQuery = `
+                CREATE EVENT \`${eventName}\`
                 ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL ${expiration} SECOND
                 ON COMPLETION NOT PRESERVE
                 DO
                     DELETE FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${keyEscaped}';
             `;
-                this.client.query(scheduledEventQuery, (error, results) => {
+                this.client.query(deleteEventQuery, (error, results) => {
                     if (error) {
                         return reject(error);
                     }
-                    if (Array.isArray(results) && results.length > 0) {
-                        return resolve(results[0].value);
-                    }
-                    return resolve(null);
+                    this.client.query(createEventQuery, (error, results) => {
+                        if (error) {
+                            return reject(error);
+                        }
+                        return resolve(null);
+                    });
                 });
             });
         });
