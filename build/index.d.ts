@@ -8,8 +8,7 @@ interface IOptions {
     expiration?: number;
 }
 declare class Client {
-    private type;
-    private client;
+    private adapter;
     private tableName;
     /**
      * Initiates the package, after run this function you will be able to run the other functions
@@ -50,10 +49,6 @@ declare class Client {
      * @returns Promise
      */
     getJson(key: string): Promise<any | null>;
-    private initMysql;
-    private getMysql;
-    private putMysql;
-    private expireMysql;
 }
 declare const client: Client;
 export = client;
