@@ -7,11 +7,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 class Client {
     constructor() {
         this.tableName = 'kvstore-keyvalues';
     }
+    /**
+     * Initiates the package, after run this function you will be able to run the other functions
+     *
+     * @param  {IClient} params
+     * @returns Promise
+     */
     init(params) {
         return __awaiter(this, void 0, void 0, function* () {
             this.client = params.client;
@@ -22,14 +27,13 @@ class Client {
             }
         });
     }
-    get(key) {
-        return __awaiter(this, void 0, void 0, function* () {
-            switch (this.type) {
-                case 'mysql':
-                    return this.getMysql(key);
-            }
-        });
-    }
+    /**
+     * Inserts or updates a value with a key
+     *
+     * @param  {string} key
+     * @param  {string} value
+     * @returns Promise
+     */
     put(key, value) {
         return __awaiter(this, void 0, void 0, function* () {
             switch (this.type) {
@@ -38,6 +42,26 @@ class Client {
             }
         });
     }
+    /**
+     * Gets value based on the key provided (or it can returns null if nothing has been found)
+     *
+     * @param  {string} key
+     * @returns Promise
+     */
+    get(key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            switch (this.type) {
+                case 'mysql':
+                    return this.getMysql(key);
+            }
+        });
+    }
+    /**
+     * Gets value on JSON format based on the key provided (or it can returns null if nothing has been found)
+     *
+     * @param  {string} key
+     * @returns Promise
+     */
     getJson(key) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield this.get(key);
@@ -68,6 +92,7 @@ class Client {
     }
     getMysql(key) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('test');
             return new Promise((resolve, reject) => {
                 const selectQuery = `SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${key}';`;
                 this.client.query(selectQuery, (error, results) => {
@@ -97,32 +122,4 @@ class Client {
     }
 }
 const client = new Client();
-/**
- * Initiates the package, after run this function you will be able to run the other functions
- *
- * @param  {IClient} params
- * @returns Promise
- */
-exports.init = client.init;
-/**
- * Inserts or updates a value with a key
- *
- * @param  {string} key
- * @param  {string} value
- * @returns Promise
- */
-exports.put = client.put;
-/**
- * Gets value on JSON format based on the key provided (or it can returns null if nothing has been found)
- *
- * @param  {string} key
- * @returns Promise
- */
-exports.getJson = client.getJson;
-/**
- * Gets value based on the key provided (or it can returns null if nothing has been found)
- *
- * @param  {string} key
- * @returns Promise
- */
-exports.get = client.get;
+module.exports = client;
