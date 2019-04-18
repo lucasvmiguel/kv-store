@@ -1,0 +1,27 @@
+{
+  "name": "kv-store",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit 0",
+    "build": "tsc -p tsconfig.json",
+    "bump": "rm -rf build && npm run build && npm version patch && git push origin master"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucasvmiguel/kv-store.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lucasvmiguel/kv-store/issues"
+  },
+  "homepage": "https://github.com/lucasvmiguel/kv-store#readme",
+  "dependencies": {
+    "mysql": "^2.17.0"
+  },
+  "devDependencies": {
+    "@types/mysql": "^2.15.5"
+  }
+}
