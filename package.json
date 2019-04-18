@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/lucasvmiguel/kv-store#readme",
   "dependencies": {
-    "mysql": "^2.17.0"
+    "mysql": "^2.17.0",
+    "typescript": "^3.4.3"
   },
   "devDependencies": {
     "@types/mysql": "^2.15.5"
