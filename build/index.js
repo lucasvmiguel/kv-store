@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 class Client {
     constructor() {
-        this.tableName = 'kvstore-keyvalues';
+        this.tableName = 'kvstore_keyvalues';
     }
     /**
      * Initiates the package, after run this function you will be able to run the other functions
@@ -32,14 +32,33 @@ class Client {
      *
      * @param  {string} key
      * @param  {string} value
+     * @param  {IOptions} options?
      * @returns Promise
      */
-    put(key, value) {
+    put(key, value, options) {
         return __awaiter(this, void 0, void 0, function* () {
             switch (this.type) {
-                case 'mysql':
+                case 'mysql': {
+                    if (options && options.expiration) {
+                        this.expireMysql(key, options.expiration);
+                    }
                     return this.putMysql(key, value);
+                }
             }
+        });
+    }
+    /**
+     * Inserts or updates a Json value with a key
+     *
+     * @param  {string} key
+     * @param  {string} value
+     * @param  {IOptions} options?
+     * @returns Promise
+     */
+    putJson(key, value, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const valueJson = JSON.stringify(value);
+            return this.put(key, valueJson, options);
         });
     }
     /**
@@ -92,9 +111,9 @@ class Client {
     }
     getMysql(key) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('test');
+            const keyEscaped = key.replace("'", "\\'");
             return new Promise((resolve, reject) => {
-                const selectQuery = `SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${key}';`;
+                const selectQuery = `SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${keyEscaped}';`;
                 this.client.query(selectQuery, (error, results) => {
                     if (error) {
                         return reject(error);
@@ -109,13 +128,39 @@ class Client {
     }
     putMysql(key, value) {
         return __awaiter(this, void 0, void 0, function* () {
+            const keyEscaped = key.replace("'", "\\'");
+            const valueEscaped = value.replace("'", "\\'");
             return new Promise((resolve, reject) => {
-                const insertQuery = `INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`) VALUES ('${key}','${value}') ON DUPLICATE KEY UPDATE \`${this.tableName}\`.value = '${value}';`;
+                const insertQuery = `INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`) VALUES ('${keyEscaped}', '${valueEscaped}') ON DUPLICATE KEY UPDATE \`${this.tableName}\`.value = '${valueEscaped}';`;
                 this.client.query(insertQuery, (error) => {
                     if (error) {
                         return reject(error);
                     }
                     return resolve(true);
+                });
+            });
+        });
+    }
+    expireMysql(key, expiration) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const keyEscaped = key.replace("'", "\\'");
+            return new Promise((resolve, reject) => {
+                const scheduledEventQuery = `
+                DROP EVENT IF EXISTS \`${this.tableName}_${keyEscaped}\`;
+                CREATE EVENT \`${this.tableName}_${keyEscaped}\`
+                ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL ${expiration} SECOND
+                ON COMPLETION NOT PRESERVE
+                DO
+                    DELETE FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${keyEscaped}';
+            `;
+                this.client.query(scheduledEventQuery, (error, results) => {
+                    if (error) {
+                        return reject(error);
+                    }
+                    if (Array.isArray(results) && results.length > 0) {
+                        return resolve(results[0].value);
+                    }
+                    return resolve(null);
                 });
             });
         });

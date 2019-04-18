@@ -4,6 +4,9 @@ interface IClient {
     type: ClientTypes;
     client: mysql.Connection;
 }
+interface IOptions {
+    expiration?: number;
+}
 declare class Client {
     private type;
     private client;
@@ -20,9 +23,19 @@ declare class Client {
      *
      * @param  {string} key
      * @param  {string} value
+     * @param  {IOptions} options?
      * @returns Promise
      */
-    put(key: string, value: string): Promise<Boolean>;
+    put(key: string, value: string, options?: IOptions): Promise<Boolean>;
+    /**
+     * Inserts or updates a Json value with a key
+     *
+     * @param  {string} key
+     * @param  {string} value
+     * @param  {IOptions} options?
+     * @returns Promise
+     */
+    putJson(key: string, value: object, options?: IOptions): Promise<Boolean>;
     /**
      * Gets value based on the key provided (or it can returns null if nothing has been found)
      *
@@ -40,6 +53,7 @@ declare class Client {
     private initMysql;
     private getMysql;
     private putMysql;
+    private expireMysql;
 }
 declare const client: Client;
 export = client;
