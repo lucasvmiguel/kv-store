@@ -12,7 +12,7 @@ npm install --save @lucasvmiguel/kv-store
 
 ## How to use
 ```js
-import kvStore from 'kv-store';
+import kvStore from '@lucasvmiguel/kv-store';
 
 const connection = mysql.createConnection({
     host: '...',
