@@ -2,7 +2,7 @@
   "name": "@lucasvmiguel/kv-store",
   "version": "1.0.4",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "exit 0",
     "build": "tsc -p tsconfig.json",
