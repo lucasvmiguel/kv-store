@@ -7,7 +7,7 @@ Key value store library that uses your current database (for you that don't want
 ## Installation
 
 ```bash
-npm install --save kv-store
+npm install --save @lucasvmiguel/kv-store
 ```
 
 ## How to use
@@ -27,11 +27,11 @@ await kvStore.init({
   client: connection,
 });
 
-await kvStore.put('USER_METRIC_HISTORY:8218', 'abc');
-await kvStore.get('USER_METRIC_HISTORY:8218');
+await kvStore.put('USER:123', 'abc');
+const abc = await kvStore.get('USER:123');
 
-await kvStore.put('USER_METRIC_HISTORY:9999', `{"foo": "bar"}`);
-await kvStore.getJson('USER_METRIC_HISTORY:8218');
+await kvStore.put('USER:456', `{"foo": "bar"}`);
+const fooBar = await kvStore.getJson('USER:456');
 ```
 
 ## RoadMap

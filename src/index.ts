@@ -2,6 +2,7 @@ import * as mysql from 'mysql';
 
 type ClientTypes = 'mysql';
 
+
 interface IClient {
     type: ClientTypes;
     client: mysql.Connection;
@@ -12,6 +13,12 @@ class Client {
     private client: mysql.Connection;
     private tableName: string = 'kvstore-keyvalues';
 
+    /**
+     * Initiates the package, after run this function you will be able to run the other functions
+     * 
+     * @param  {IClient} params
+     * @returns Promise
+     */
     public async init(params: IClient): Promise<Boolean> {
         this.client = params.client;
         this.type = params.type;
@@ -21,7 +28,12 @@ class Client {
             return this.initMysql();
         }
     }
-
+    /**
+     * Gets value based on the key provided (or it can returns null if nothing has been found)
+     * 
+     * @param  {string} key
+     * @returns Promise
+     */
     public async get(key: string): Promise<string | null> {
         switch (this.type) {
         case 'mysql':
@@ -29,6 +41,13 @@ class Client {
         }
     }
 
+    /**
+     * Inserts or updates a value with a key
+     * 
+     * @param  {string} key
+     * @param  {string} value
+     * @returns Promise
+     */
     public async put(key: string, value: string): Promise<Boolean> {
         switch (this.type) {
         case 'mysql':
@@ -36,6 +55,12 @@ class Client {
         }
     }
 
+    /**
+     * Gets value on JSON format based on the key provided (or it can returns null if nothing has been found)
+     * 
+     * @param  {string} key
+     * @returns Promise
+     */
     public async getJson(key: string): Promise<any | null> {
         const result = await this.get(key);
 
