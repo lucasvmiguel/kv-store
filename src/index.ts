@@ -83,7 +83,8 @@ class Client {
         const result = await this.get(key);
 
         if (result) {
-            return JSON.parse(result);
+            const resultEscaped = result.replace('\r', '\\r').replace('\n', '\\n');   
+            return JSON.parse(resultEscaped);
         }
 
         return null;

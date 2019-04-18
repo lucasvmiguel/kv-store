@@ -79,7 +79,8 @@ class Client {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield this.get(key);
             if (result) {
-                return JSON.parse(result);
+                const resultEscaped = result.replace('\r', '\\r').replace('\n', '\\n');
+                return JSON.parse(resultEscaped);
             }
             return null;
         });
