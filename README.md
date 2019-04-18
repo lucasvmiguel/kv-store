@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/lucasvmiguel/kv-store.svg?branch=master)](https://travis-ci.org/lucasvmiguel/kv-store)
 
 ## Description
-Key value store library that uses your current database (for you that don't want to even spend more money)
+Key value store library that uses your current database (for you that don't want to spend even more money)
 
 ## Installation
 
