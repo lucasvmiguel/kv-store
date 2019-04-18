@@ -1,4 +1,5 @@
-# KV Store
+<p align="center"><img src="logo/horizontal.png" alt="kv-store" height="80px"></p>
+
 [![Build Status](https://travis-ci.org/lucasvmiguel/kv-store.svg?branch=master)](https://travis-ci.org/lucasvmiguel/kv-store)
 
 ## Description
