@@ -1,4 +1,5 @@
 import * as mysql from 'mysql';
+
 import { IAdapter } from './adapter';
 
 export class MysqlAdapter implements IAdapter {
@@ -6,7 +7,7 @@ export class MysqlAdapter implements IAdapter {
     private tableName: string;
 
     public constructor(tableName: string, connection: mysql.Connection) {
-        this.tableName = tableName;
+        this.tableName = mysql.escape(tableName);
         this.connection = connection;
     }
 
@@ -30,9 +31,9 @@ export class MysqlAdapter implements IAdapter {
     }
 
     public async get(key: string): Promise<string | null> {
-        const keyEscaped = key.replace("'", "\\'");
-
         return new Promise<string | null>((resolve, reject) => {
+            const keyEscaped = mysql.escape(key.replace("'", "\\'"));
+
             const selectQuery = `SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${keyEscaped}';`;
 
             this.connection.query(selectQuery, (error, results) => {
@@ -50,10 +51,10 @@ export class MysqlAdapter implements IAdapter {
     }
 
     public async put(key: string, value: string): Promise<Boolean> {
-        const keyEscaped = key.replace("'", "\\'");
-        const valueEscaped = value.replace("'", "\\'");
-
         return new Promise<Boolean>((resolve, reject) => {
+            const keyEscaped = mysql.escape(key.replace("'", "\\'"));
+            const valueEscaped = mysql.escape(value.replace("'", "\\'"));
+
             const insertQuery = `INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`) VALUES ('${keyEscaped}', '${valueEscaped}') ON DUPLICATE KEY UPDATE \`${this.tableName}\`.value = '${valueEscaped}';`;
 
             this.connection.query(insertQuery, (error) => {
@@ -67,14 +68,15 @@ export class MysqlAdapter implements IAdapter {
     }
 
     public async expire(key: string, expiration: number): Promise<string | null> {
-        const keyEscaped = key.replace("'", "\\'");
-
         return new Promise<string | null>((resolve, reject) => {
-            const eventName = `${this.tableName}_${keyEscaped}`;
-            const deleteEventQuery = `DROP EVENT IF EXISTS \`${eventName}\`;`;
+            const keyEscaped = mysql.escape(key.replace("'", "\\'"));
+            const eventNameEscaped = mysql.escape(`${this.tableName}_${keyEscaped}`);
+            const expirationEscaped = mysql.escape(expiration);
+
+            const deleteEventQuery = `DROP EVENT IF EXISTS \`${eventNameEscaped}\`;`;
             const createEventQuery = `
-                CREATE EVENT \`${eventName}\`
-                ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL ${expiration} SECOND
+                CREATE EVENT \`${eventNameEscaped}\`
+                ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL ${expirationEscaped} SECOND
                 ON COMPLETION NOT PRESERVE
                 DO
                     DELETE FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${keyEscaped}';
