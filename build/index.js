@@ -11,6 +11,7 @@ const mysql_1 = require("./adapters/mysql");
 class Client {
     constructor() {
         this.tableName = 'kvstore_keyvalues';
+        this.debug = false;
     }
     /**
      * Initiates the package, after run this function you will be able to run the other functions
@@ -20,12 +21,13 @@ class Client {
      */
     init(params) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.debug = !!params.debug;
             if (params.tableName) {
                 this.tableName = params.tableName;
             }
             switch (params.type) {
                 case 'mysql':
-                    this.adapter = new mysql_1.MysqlAdapter(this.tableName, params.client);
+                    this.adapter = new mysql_1.MysqlAdapter(this.tableName, params.client, this.debug);
                     break;
             }
             return this.adapter.init();

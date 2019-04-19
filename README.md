@@ -33,7 +33,8 @@ const connection = mysql.createConnection({
 await kvStore.init({
   type: 'mysql',
   client: connection,
-  tableName: 'kvstore_keyvalues' // OPTIONAL
+  tableName: 'kvstore_keyvalues', // OPTIONAL
+  debug: false, // OPTIONAL
 });
 
 await kvStore.put('USER:123', 'abc');

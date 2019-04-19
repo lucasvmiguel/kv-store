@@ -4,6 +4,7 @@ interface IClient {
     type: ClientTypes;
     client: mysql.Connection;
     tableName?: string;
+    debug?: boolean;
 }
 interface IOptions {
     expiration?: number;
@@ -11,6 +12,7 @@ interface IOptions {
 declare class Client {
     private adapter;
     private tableName;
+    private debug;
     /**
      * Initiates the package, after run this function you will be able to run the other functions
      *

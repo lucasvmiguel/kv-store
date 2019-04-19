@@ -10,9 +10,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const mysql = require("mysql");
 class MysqlAdapter {
-    constructor(tableName, connection) {
+    constructor(tableName, connection, debug) {
         this.tableName = mysql.escape(tableName).replace(/\'/g, "");
         this.connection = connection;
+        this.debug = debug;
+    }
+    maybeDebug(operation, query) {
+        if (this.debug) {
+            console.log('KV-STORE DEBUG', operation, query);
+        }
     }
     init() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -23,6 +29,7 @@ class MysqlAdapter {
                 PRIMARY KEY (\`key\`)
             );
         `;
+            this.maybeDebug('init', createTableQuery);
             return new Promise((resolve, reject) => {
                 this.connection.query(createTableQuery, (err) => {
                     if (err) {
@@ -38,6 +45,7 @@ class MysqlAdapter {
             return new Promise((resolve, reject) => {
                 const keyEscaped = mysql.escape(key.replace("'", "\\'"));
                 const selectQuery = `SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = ${keyEscaped};`;
+                this.maybeDebug('get', selectQuery);
                 this.connection.query(selectQuery, (error, results) => {
                     if (error) {
                         return reject(error);
@@ -56,6 +64,7 @@ class MysqlAdapter {
                 const keyEscaped = mysql.escape(key.replace("'", "\\'"));
                 const valueEscaped = mysql.escape(value.replace("'", "\\'"));
                 const insertQuery = `INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`) VALUES (${keyEscaped}, ${valueEscaped}) ON DUPLICATE KEY UPDATE \`${this.tableName}\`.value = ${valueEscaped};`;
+                this.maybeDebug('put', insertQuery);
                 this.connection.query(insertQuery, (error) => {
                     if (error) {
                         return reject(error);
@@ -80,6 +89,8 @@ class MysqlAdapter {
                 DO
                     DELETE FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = ${keyEscaped};
             `;
+                this.maybeDebug('delete old expiration', deleteEventQuery);
+                this.maybeDebug('create new expiration', createEventQuery);
                 this.connection.query(deleteEventQuery, (error, results) => {
                     if (error) {
                         return reject(error);

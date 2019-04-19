@@ -8,6 +8,7 @@ interface IClient {
     type: ClientTypes;
     client: mysql.Connection;
     tableName?: string;
+    debug?: boolean;
 }
 
 interface IOptions {
@@ -17,6 +18,7 @@ interface IOptions {
 class Client {
     private adapter: IAdapter;
     private tableName: string = 'kvstore_keyvalues';
+    private debug: boolean = false;
 
     /**
      * Initiates the package, after run this function you will be able to run the other functions
@@ -25,13 +27,15 @@ class Client {
      * @returns Promise
      */
     public async init(params: IClient): Promise<Boolean> {
+        this.debug = !!params.debug;
+        
         if (params.tableName) {
             this.tableName = params.tableName;
-        } 
+        }
 
         switch (params.type) {
             case 'mysql': 
-                this.adapter = new MysqlAdapter(this.tableName, params.client);
+                this.adapter = new MysqlAdapter(this.tableName, params.client, this.debug);
                 break;
         }
 

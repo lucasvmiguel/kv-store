@@ -3,7 +3,9 @@ import { IAdapter } from './adapter';
 export declare class MysqlAdapter implements IAdapter {
     private connection;
     private tableName;
-    constructor(tableName: string, connection: mysql.Connection);
+    private debug;
+    constructor(tableName: string, connection: mysql.Connection, debug: boolean);
+    private maybeDebug;
     init(): Promise<Boolean>;
     get(key: string): Promise<string | null>;
     put(key: string, value: string): Promise<Boolean>;
