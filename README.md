@@ -41,9 +41,6 @@ await kvStore.put('USER:456', `{"foo": "bar"}`, { expiration: 60 });
 const fooBar = await kvStore.getJson('USER:456');
 ```
 
-## RoadMap
-* Include more databases
-
 ## License
 
 [MIT](LICENSE)
