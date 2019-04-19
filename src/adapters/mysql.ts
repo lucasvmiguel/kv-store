@@ -71,7 +71,7 @@ export class MysqlAdapter implements IAdapter {
         return new Promise<string | null>((resolve, reject) => {
             const cleanKey = key.replace("'", "\\'")
             const keyEscaped = mysql.escape(cleanKey);
-            const eventNameEscaped = mysql.escape(`${this.tableName}_${cleanKey}`);
+            const eventNameEscaped = mysql.escape(`${this.tableName}_${cleanKey}`).replace("\'", "");
             const expirationEscaped = mysql.escape(expiration);
 
             const deleteEventQuery = `DROP EVENT IF EXISTS \`${eventNameEscaped}\`;`;
