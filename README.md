@@ -5,6 +5,8 @@
 ## Description
 Key value store library that uses your current database (for you that don't want to spend more money)
 
+PS: if you have money to spend, maybe it's better to use a better database solution for this particular problem, as suggested here: https://www.reddit.com/r/javascript/comments/beyjef/key_value_storage_in_your_own_database_if_you/el9s32b?utm_source=share&utm_medium=web2x
+
 Databases available:
 * Mysql
 * Postgres (roadmap)
