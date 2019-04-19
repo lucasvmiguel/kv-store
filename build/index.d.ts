@@ -3,6 +3,7 @@ declare type ClientTypes = 'mysql';
 interface IClient {
     type: ClientTypes;
     client: mysql.Connection;
+    tableName?: string;
 }
 interface IOptions {
     expiration?: number;

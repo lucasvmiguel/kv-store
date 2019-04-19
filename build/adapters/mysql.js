@@ -11,7 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mysql = require("mysql");
 class MysqlAdapter {
     constructor(tableName, connection) {
-        this.tableName = tableName;
+        this.tableName = mysql.escape(tableName).replace(/\'/g, "");
         this.connection = connection;
     }
     init() {

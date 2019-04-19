@@ -20,6 +20,9 @@ class Client {
      */
     init(params) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (params.tableName) {
+                this.tableName = params.tableName;
+            }
             switch (params.type) {
                 case 'mysql':
                     this.adapter = new mysql_1.MysqlAdapter(this.tableName, params.client);

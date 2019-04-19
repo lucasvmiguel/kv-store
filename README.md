@@ -33,13 +33,14 @@ const connection = mysql.createConnection({
 await kvStore.init({
   type: 'mysql',
   client: connection,
+  tableName: 'kvstore_keyvalues' // OPTIONAL
 });
 
 await kvStore.put('USER:123', 'abc');
 const abc = await kvStore.get('USER:123');
 
 // Expiration in seconds
-await kvStore.put('USER:456', `{"foo": "bar"}`, { expiration: 60 });
+await kvStore.putJson('USER:456', {foo: "bar"}, { expiration: 60 });
 const fooBar = await kvStore.getJson('USER:456');
 ```
 

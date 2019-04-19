@@ -7,7 +7,7 @@ export class MysqlAdapter implements IAdapter {
     private tableName: string;
 
     public constructor(tableName: string, connection: mysql.Connection) {
-        this.tableName = tableName;
+        this.tableName = mysql.escape(tableName).replace(/\'/g, "");
         this.connection = connection;
     }
 

@@ -7,6 +7,7 @@ type ClientTypes = 'mysql';
 interface IClient {
     type: ClientTypes;
     client: mysql.Connection;
+    tableName?: string;
 }
 
 interface IOptions {
@@ -24,6 +25,10 @@ class Client {
      * @returns Promise
      */
     public async init(params: IClient): Promise<Boolean> {
+        if (params.tableName) {
+            this.tableName = params.tableName;
+        } 
+
         switch (params.type) {
             case 'mysql': 
                 this.adapter = new MysqlAdapter(this.tableName, params.client);
