@@ -8,9 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const mysql = require("mysql");
 class MysqlAdapter {
     constructor(tableName, connection) {
-        this.tableName = tableName;
+        this.tableName = mysql.escape(tableName);
         this.connection = connection;
     }
     init() {
@@ -34,8 +35,8 @@ class MysqlAdapter {
     }
     get(key) {
         return __awaiter(this, void 0, void 0, function* () {
-            const keyEscaped = key.replace("'", "\\'");
             return new Promise((resolve, reject) => {
+                const keyEscaped = mysql.escape(key.replace("'", "\\'"));
                 const selectQuery = `SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${keyEscaped}';`;
                 this.connection.query(selectQuery, (error, results) => {
                     if (error) {
@@ -51,9 +52,9 @@ class MysqlAdapter {
     }
     put(key, value) {
         return __awaiter(this, void 0, void 0, function* () {
-            const keyEscaped = key.replace("'", "\\'");
-            const valueEscaped = value.replace("'", "\\'");
             return new Promise((resolve, reject) => {
+                const keyEscaped = mysql.escape(key.replace("'", "\\'"));
+                const valueEscaped = mysql.escape(value.replace("'", "\\'"));
                 const insertQuery = `INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`) VALUES ('${keyEscaped}', '${valueEscaped}') ON DUPLICATE KEY UPDATE \`${this.tableName}\`.value = '${valueEscaped}';`;
                 this.connection.query(insertQuery, (error) => {
                     if (error) {
@@ -66,13 +67,14 @@ class MysqlAdapter {
     }
     expire(key, expiration) {
         return __awaiter(this, void 0, void 0, function* () {
-            const keyEscaped = key.replace("'", "\\'");
             return new Promise((resolve, reject) => {
-                const eventName = `${this.tableName}_${keyEscaped}`;
-                const deleteEventQuery = `DROP EVENT IF EXISTS \`${eventName}\`;`;
+                const keyEscaped = mysql.escape(key.replace("'", "\\'"));
+                const eventNameEscaped = mysql.escape(`${this.tableName}_${keyEscaped}`);
+                const expirationEscaped = mysql.escape(expiration);
+                const deleteEventQuery = `DROP EVENT IF EXISTS \`${eventNameEscaped}\`;`;
                 const createEventQuery = `
-                CREATE EVENT \`${eventName}\`
-                ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL ${expiration} SECOND
+                CREATE EVENT \`${eventNameEscaped}\`
+                ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL ${expirationEscaped} SECOND
                 ON COMPLETION NOT PRESERVE
                 DO
                     DELETE FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = '${keyEscaped}';
