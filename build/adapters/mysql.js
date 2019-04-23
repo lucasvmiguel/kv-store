@@ -69,7 +69,7 @@ class MysqlAdapter {
             return new Promise((resolve, reject) => {
                 const keyEscaped = this.escape(key);
                 const valueEscaped = this.escape(value);
-                const expiresEscaped = options && options.expiration ? this.escape(value) : 'NULL';
+                const expiresEscaped = options && options.expiration ? this.escape(`${options.expiration}`) : 'NULL';
                 const insertQuery = `
                 INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`, \`expires_at\`) 
                 VALUES (${keyEscaped}, ${valueEscaped}, ${expiresEscaped}) 
