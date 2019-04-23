@@ -51,11 +51,7 @@ class Client {
      * @returns Promise
      */
     public async put(key: string, value: string, options?: IOptions): Promise<Boolean> {
-        if (options && options.expiration) {
-            this.adapter.expire(key, options.expiration);
-        }
-
-        return this.adapter.put(key, value);
+        return this.adapter.put(key, value, options);
     }
 
     /**

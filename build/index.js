@@ -43,10 +43,7 @@ class Client {
      */
     put(key, value, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (options && options.expiration) {
-                this.adapter.expire(key, options.expiration);
-            }
-            return this.adapter.put(key, value);
+            return this.adapter.put(key, value, options);
         });
     }
     /**

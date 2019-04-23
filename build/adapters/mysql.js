@@ -11,6 +11,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mysql = require("mysql");
 class MysqlAdapter {
     constructor(tableName, connection, debug) {
+        this.escape = (text) => {
+            return mysql.escape(text.replace("'", "\'"));
+        };
         this.tableName = mysql.escape(tableName).replace(/\'/g, "");
         this.connection = connection;
         this.debug = debug;
@@ -26,6 +29,7 @@ class MysqlAdapter {
             CREATE TABLE IF NOT EXISTS \`${this.tableName}\` (
                 \`key\` VARCHAR(255) NOT NULL,
                 \`value\` TEXT NULL,
+                \`expires_at\` DATETIME NULL,
                 PRIMARY KEY (\`key\`)
             );
         `;
@@ -43,8 +47,10 @@ class MysqlAdapter {
     get(key) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                const keyEscaped = mysql.escape(key.replace("'", "\\'"));
-                const selectQuery = `SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = ${keyEscaped};`;
+                const keyEscaped = this.escape(key);
+                const selectQuery = `
+                SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` 
+                WHERE \`${this.tableName}\`.key = ${keyEscaped} AND expires_at > CURRENT_TIME;`;
                 this.maybeDebug('get', selectQuery);
                 this.connection.query(selectQuery, (error, results) => {
                     if (error) {
@@ -58,49 +64,23 @@ class MysqlAdapter {
             });
         });
     }
-    put(key, value) {
+    put(key, value, options) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                const keyEscaped = mysql.escape(key.replace("'", "\\'"));
-                const valueEscaped = mysql.escape(value.replace("'", "\\'"));
-                const insertQuery = `INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`) VALUES (${keyEscaped}, ${valueEscaped}) ON DUPLICATE KEY UPDATE \`${this.tableName}\`.value = ${valueEscaped};`;
+                const keyEscaped = this.escape(key);
+                const valueEscaped = this.escape(value);
+                const expiresEscaped = options && options.expiration ? this.escape(value) : 'NULL';
+                const insertQuery = `
+                INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`, \`expires_at\`) 
+                VALUES (${keyEscaped}, ${valueEscaped}, ${expiresEscaped}) 
+                ON DUPLICATE KEY UPDATE 
+                    \`${this.tableName}\`.value = ${valueEscaped}, \`${this.tableName}\`.expires_at = CURRENT_TIMESTAMP + INTERVAL ${expiresEscaped} SECOND;`;
                 this.maybeDebug('put', insertQuery);
                 this.connection.query(insertQuery, (error) => {
                     if (error) {
                         return reject(error);
                     }
                     return resolve(true);
-                });
-            });
-        });
-    }
-    expire(key, expiration) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                const cleanKey = key.replace("'", "\\'");
-                const keyEscaped = mysql.escape(cleanKey);
-                const eventNameEscaped = mysql.escape(`${this.tableName}_${cleanKey}`).replace(/\'/g, "");
-                const expirationEscaped = mysql.escape(expiration);
-                const deleteEventQuery = `DROP EVENT IF EXISTS \`${eventNameEscaped}\`;`;
-                const createEventQuery = `
-                CREATE EVENT \`${eventNameEscaped}\`
-                ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL ${expirationEscaped} SECOND
-                ON COMPLETION NOT PRESERVE
-                DO
-                    DELETE FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = ${keyEscaped};
-            `;
-                this.maybeDebug('delete old expiration', deleteEventQuery);
-                this.maybeDebug('create new expiration', createEventQuery);
-                this.connection.query(deleteEventQuery, (error, results) => {
-                    if (error) {
-                        return reject(error);
-                    }
-                    this.connection.query(createEventQuery, (error, results) => {
-                        if (error) {
-                            return reject(error);
-                        }
-                        return resolve(null);
-                    });
                 });
             });
         });
