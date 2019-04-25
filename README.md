@@ -1,6 +1,8 @@
 <p align="center"><img src="logo/horizontal.png" alt="kv-store" height="80px"></p>
 
+[![Version](https://img.shields.io/npm/v/@lucasvmiguel/kv-store.svg)](https://www.npmjs.org/package/@lucasvmiguel/kv-store)
 [![Build Status](https://travis-ci.org/lucasvmiguel/kv-store.svg?branch=master)](https://travis-ci.org/lucasvmiguel/kv-store)
+[![Downloads](https://img.shields.io/npm/dm/@lucasvmiguel/kv-store.svg)](https://www.npmjs.org/package/@lucasvmiguel/kv-store)
 
 ## Description
 Key value store library that uses your current database. It might be the case that you don't want to spend money in a new instance or in another service.
