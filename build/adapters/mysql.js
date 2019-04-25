@@ -72,7 +72,7 @@ class MysqlAdapter {
                 const expiresEscaped = options && options.expiration ? this.escape(`${options.expiration}`) : 'NULL';
                 const insertQuery = `
                 INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`, \`expires_at\`) 
-                VALUES (${keyEscaped}, ${valueEscaped}, ${expiresEscaped}) 
+                VALUES (${keyEscaped}, ${valueEscaped}, CURRENT_TIMESTAMP + INTERVAL ${expiresEscaped} SECOND) 
                 ON DUPLICATE KEY UPDATE 
                     \`${this.tableName}\`.value = ${valueEscaped}, \`${this.tableName}\`.expires_at = CURRENT_TIMESTAMP + INTERVAL ${expiresEscaped} SECOND;`;
                 this.maybeDebug('put', insertQuery);

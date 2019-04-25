@@ -77,7 +77,7 @@ export class MysqlAdapter implements IAdapter {
 
             const insertQuery = `
                 INSERT INTO \`${this.tableName}\`(\`key\`, \`value\`, \`expires_at\`) 
-                VALUES (${keyEscaped}, ${valueEscaped}, ${expiresEscaped}) 
+                VALUES (${keyEscaped}, ${valueEscaped}, CURRENT_TIMESTAMP + INTERVAL ${expiresEscaped} SECOND) 
                 ON DUPLICATE KEY UPDATE 
                     \`${this.tableName}\`.value = ${valueEscaped}, \`${this.tableName}\`.expires_at = CURRENT_TIMESTAMP + INTERVAL ${expiresEscaped} SECOND;`;
 
