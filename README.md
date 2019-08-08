@@ -10,7 +10,7 @@ Key value store library that uses your current database. It might be the case th
 PS: if you have money to spend, maybe it's better to use a better database solution for this particular problem, as suggested here: https://www.reddit.com/r/javascript/comments/beyjef/key_value_storage_in_your_own_database_if_you/el9s32b?utm_source=share&utm_medium=web2x
 
 Adapters available:
-* In memory
+* Local
 * MySQL
 * Redis
 * Postgres (roadmap)
