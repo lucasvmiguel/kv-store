@@ -1,8 +1,9 @@
 import { IAdapter, Connection } from './adapters/adapter';
 import { MysqlAdapter } from './adapters/mysql';
 import { RedisAdapter } from './adapters/redis';
+import { LocalAdapter } from './adapters/local';
 
-type ClientTypes = 'mysql' | 'redis';
+type ClientTypes = 'mysql' | 'redis' | 'local';
 
 interface IClient {
     type: ClientTypes;
@@ -40,6 +41,10 @@ class Client {
 
             case 'redis':
                 this.adapter = new RedisAdapter(this.tableName, params.client, this.debug);
+                break;
+
+            case 'local':
+                this.adapter = new LocalAdapter(this.tableName, params.client, this.debug);
                 break;
         }
 

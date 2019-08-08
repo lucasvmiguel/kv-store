@@ -2,7 +2,7 @@ import * as mysql from "mysql";
 import * as redis from "redis";
 
 // add new connection types for new adapters
-export type Connection = mysql.Connection | redis.RedisClient;
+export type Connection = mysql.Connection | redis.RedisClient | null;
 
 export interface IOptions {
   expiration?: number;
