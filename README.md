@@ -21,6 +21,8 @@ npm install --save @lucasvmiguel/kv-store
 ```
 
 ## How to use
+
+#### MYSQL
 ```js
 import * as kvStore from '@lucasvmiguel/kv-store';
 
@@ -34,6 +36,27 @@ const connection = mysql.createConnection({
 
 await kvStore.init({
   type: 'mysql',
+  client: connection,
+  tableName: 'kvstore_keyvalues', // OPTIONAL
+  debug: false, // OPTIONAL
+});
+
+await kvStore.put('USER:123', 'abc');
+const abc = await kvStore.get('USER:123');
+
+// Expiration in seconds
+await kvStore.putJson('USER:456', {foo: "bar"}, { expiration: 60 });
+const fooBar = await kvStore.getJson('USER:456');
+```
+
+#### Redis
+```js
+import * as kvStore from '@lucasvmiguel/kv-store';
+
+const connection = redis.createClient(6379, '127.0.0.1')
+
+await kvStore.init({
+  type: 'redis',
   client: connection,
   tableName: 'kvstore_keyvalues', // OPTIONAL
   debug: false, // OPTIONAL

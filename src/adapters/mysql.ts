@@ -8,9 +8,9 @@ export class MysqlAdapter implements IAdapter {
     private tableName: string;
     private debug: boolean;
 
-    public constructor(tableName: string, connection: mysql.Connection, debug: boolean) {
+    public constructor(tableName: string, connection: Connection, debug: boolean) {
         this.tableName = mysql.escape(tableName).replace(/\'/g, "");
-        this.connection = connection;
+        this.connection = connection as mysql.Connection;
         this.debug = debug;
     }
 
@@ -55,7 +55,7 @@ export class MysqlAdapter implements IAdapter {
     public async refresh(connection: Connection): Promise<boolean> {
         this.maybeDebug('refresh', this.createTableQuery());
 
-        this.connection = connection;
+        this.connection = connection as mysql.Connection;
 
         return this.connect();
     }
@@ -101,6 +101,20 @@ export class MysqlAdapter implements IAdapter {
             this.connection.query(insertQuery, (error) => {
                 if (error) {
                     return reject(error);
+                }
+
+                return resolve(true);
+            });
+        });
+    }
+
+    public async close(): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            this.maybeDebug('close', '');
+
+            this.connection.end((err: Error | null) => {
+                if (err) {
+                    return reject(err);
                 }
 
                 return resolve(true);

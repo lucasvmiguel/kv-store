@@ -6,7 +6,8 @@
   "scripts": {
     "test": "exit 0",
     "build": "tsc -p tsconfig.json",
-    "bump": "rm -rf build && npm run build && npm version patch && git push origin master"
+    "bump:patch": "rm -rf build && npm run build && npm version patch && git push origin master",
+    "bump:minor": "rm -rf build && npm run build && npm version minor && git push origin master"
   },
   "repository": {
     "type": "git",
@@ -20,9 +21,11 @@
   "homepage": "https://github.com/lucasvmiguel/kv-store#readme",
   "dependencies": {
     "mysql": "^2.17.0",
+    "redis": "^2.8.0",
     "typescript": "^3.4.3"
   },
   "devDependencies": {
-    "@types/mysql": "^2.15.5"
+    "@types/mysql": "^2.15.5",
+    "@types/redis": "^2.8.13"
   }
 }

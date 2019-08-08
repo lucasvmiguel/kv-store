@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const mysql_1 = require("./adapters/mysql");
+const redis_1 = require("./adapters/redis");
 class Client {
     constructor() {
         this.tableName = 'kvstore_keyvalues';
@@ -28,6 +29,9 @@ class Client {
             switch (params.type) {
                 case 'mysql':
                     this.adapter = new mysql_1.MysqlAdapter(this.tableName, params.client, this.debug);
+                    break;
+                case 'redis':
+                    this.adapter = new redis_1.RedisAdapter(this.tableName, params.client, this.debug);
                     break;
             }
             return this.adapter.init();
@@ -96,6 +100,16 @@ class Client {
                 return JSON.parse(resultEscaped);
             }
             return null;
+        });
+    }
+    /**
+     * Close the connection
+     *
+     * @returns Promise
+     */
+    close() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.adapter.close();
         });
     }
 }

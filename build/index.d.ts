@@ -1,5 +1,5 @@
 import { Connection } from './adapters/adapter';
-declare type ClientTypes = 'mysql';
+declare type ClientTypes = 'mysql' | 'redis';
 interface IClient {
     type: ClientTypes;
     client: Connection;
@@ -59,6 +59,12 @@ declare class Client {
      * @returns Promise
      */
     getJson(key: string): Promise<any | null>;
+    /**
+     * Close the connection
+     *
+     * @returns Promise
+     */
+    close(): Promise<Boolean>;
 }
 declare const client: Client;
 export = client;

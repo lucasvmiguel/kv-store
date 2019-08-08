@@ -1,7 +1,8 @@
 import { IAdapter, Connection } from './adapters/adapter';
 import { MysqlAdapter } from './adapters/mysql';
+import { RedisAdapter } from './adapters/redis';
 
-type ClientTypes = 'mysql';
+type ClientTypes = 'mysql' | 'redis';
 
 interface IClient {
     type: ClientTypes;
@@ -35,6 +36,10 @@ class Client {
         switch (params.type) {
             case 'mysql':
                 this.adapter = new MysqlAdapter(this.tableName, params.client, this.debug);
+                break;
+
+            case 'redis':
+                this.adapter = new RedisAdapter(this.tableName, params.client, this.debug);
                 break;
         }
 
@@ -101,6 +106,14 @@ class Client {
         }
 
         return null;
+    }
+    /**
+     * Close the connection
+     * 
+     * @returns Promise
+     */
+    public async close(): Promise<Boolean> {
+        return this.adapter.close();
     }
 }
 

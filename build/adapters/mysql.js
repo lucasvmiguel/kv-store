@@ -97,5 +97,18 @@ class MysqlAdapter {
             });
         });
     }
+    close() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                this.maybeDebug('close', '');
+                this.connection.end((err) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    return resolve(true);
+                });
+            });
+        });
+    }
 }
 exports.MysqlAdapter = MysqlAdapter;
