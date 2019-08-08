@@ -5,9 +5,7 @@
 [![Downloads](https://img.shields.io/npm/dm/@lucasvmiguel/kv-store.svg)](https://www.npmjs.org/package/@lucasvmiguel/kv-store)
 
 ## Description
-Key value store library that uses your current database. It might be the case that you don't want to spend money in a new instance or in another service.
-
-PS: if you have money to spend, maybe it's better to use a better database solution for this particular problem, as suggested here: https://www.reddit.com/r/javascript/comments/beyjef/key_value_storage_in_your_own_database_if_you/el9s32b?utm_source=share&utm_medium=web2x
+Key value store library that uses a few database options. It might be the case that you don't want to spend money in a new instance or in another service.
 
 Adapters available:
 * Local
