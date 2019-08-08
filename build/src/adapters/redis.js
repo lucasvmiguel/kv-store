@@ -73,6 +73,19 @@ class RedisAdapter {
             });
         });
     }
+    del(key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                this.maybeDebug('get', `${this.tableName}:${key}`);
+                this.connection.del(`${this.tableName}:${key}`, err => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    return resolve(true);
+                });
+            });
+        });
+    }
     close() {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {

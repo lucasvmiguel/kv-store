@@ -62,7 +62,7 @@ class MysqlAdapter {
                 const keyEscaped = this.escape(key);
                 const selectQuery = `
                 SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` 
-                WHERE \`${this.tableName}\`.key = ${keyEscaped} AND expires_at > CURRENT_TIME;`;
+                WHERE \`${this.tableName}\`.key = ${keyEscaped} AND (\`${this.tableName}\`.expires_at > CURRENT_TIME OR \`${this.tableName}\`.expires_at IS NULL);`;
                 this.maybeDebug('get', selectQuery);
                 this.connection.query(selectQuery, (error, results) => {
                     if (error) {
@@ -89,6 +89,20 @@ class MysqlAdapter {
                     \`${this.tableName}\`.value = ${valueEscaped}, \`${this.tableName}\`.expires_at = CURRENT_TIMESTAMP + INTERVAL ${expiresEscaped} SECOND;`;
                 this.maybeDebug('put', insertQuery);
                 this.connection.query(insertQuery, (error) => {
+                    if (error) {
+                        return reject(error);
+                    }
+                    return resolve(true);
+                });
+            });
+        });
+    }
+    del(key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                const keyEscaped = this.escape(key);
+                const deleteQuery = `DELETE FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = ${keyEscaped};`;
+                this.connection.query(deleteQuery, (error) => {
                     if (error) {
                         return reject(error);
                     }

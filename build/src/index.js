@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 const mysql_1 = require("./adapters/mysql");
 const redis_1 = require("./adapters/redis");
+const local_1 = require("./adapters/local");
 class Client {
     constructor() {
         this.tableName = 'kvstore_keyvalues';
@@ -32,6 +33,9 @@ class Client {
                     break;
                 case 'redis':
                     this.adapter = new redis_1.RedisAdapter(this.tableName, params.client, this.debug);
+                    break;
+                case 'local':
+                    this.adapter = new local_1.LocalAdapter(this.tableName, params.client, this.debug);
                     break;
             }
             return this.adapter.init();
@@ -100,6 +104,17 @@ class Client {
                 return JSON.parse(resultEscaped);
             }
             return null;
+        });
+    }
+    /**
+     * Delete key
+     *
+     * @param  {string} key
+     * @returns Promise
+     */
+    del(key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.adapter.del(key);
         });
     }
     /**

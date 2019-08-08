@@ -1,5 +1,5 @@
 import { Connection } from './adapters/adapter';
-declare type ClientTypes = 'mysql' | 'redis';
+declare type ClientTypes = 'mysql' | 'redis' | 'local';
 interface IClient {
     type: ClientTypes;
     client: Connection;
@@ -59,6 +59,13 @@ declare class Client {
      * @returns Promise
      */
     getJson(key: string): Promise<any | null>;
+    /**
+     * Delete key
+     *
+     * @param  {string} key
+     * @returns Promise
+     */
+    del(key: string): Promise<Boolean>;
     /**
      * Close the connection
      *
