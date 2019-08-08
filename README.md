@@ -89,6 +89,43 @@ await kvStore.putJson('USER:456', {foo: "bar"}, { expiration: 60 });
 const fooBar = await kvStore.getJson('USER:456');
 ```
 
+## API Reference
+
+* expiration is in seconds
+* just pass null to init if is local cache
+
+{
+    type: ClientTypes;
+    client: Connection;
+    tableName?: string;
+    debug?: boolean;
+}
+
+```typescript
+function init: ({
+    type: 'mysql' OR 'redis' OR 'local',
+    client: mysql.Connection OR redis.RedisClient OR null,
+    tableName?: string;
+    debug?: boolean;
+}) => Promise<boolean>
+```
+
+```js
+function refresh(connection: mysql.Connection OR redis.RedisClient OR null) => Promise<boolean>
+```
+
+```js
+function get(key: string) => Promise<string OR null>;
+```
+
+```js
+function put(key: string, value: string, options?: {expiration?: number}) => Promise<boolean>
+```
+
+```js
+function del(key: string) => Promise<boolean OR null>
+```
+
 ## License
 
 [MIT](LICENSE)
