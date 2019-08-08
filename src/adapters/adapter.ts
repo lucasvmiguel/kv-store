@@ -14,4 +14,5 @@ export interface IAdapter {
   refresh: (connection: Connection) => Promise<boolean>;
   get(key: string): Promise<string | null>;
   put(key: string, value: string, options?: IOptions): Promise<boolean>;
+  del(key: string): Promise<boolean | null>;
 }

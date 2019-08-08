@@ -82,6 +82,20 @@ export class RedisAdapter implements IAdapter {
         });
     }
 
+    public async del(key: string): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            this.maybeDebug('get', `${this.tableName}:${key}`);
+
+            this.connection.del(`${this.tableName}:${key}`, err => {
+                if (err) {
+                    return reject(err);
+                }
+
+                return resolve(true);
+            });
+        });
+    }
+
     public async close(): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             this.maybeDebug('close', '');

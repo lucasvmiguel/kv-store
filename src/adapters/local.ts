@@ -1,11 +1,7 @@
-import * as redis from 'redis';
-
 import { IAdapter, IOptions, Connection } from './adapter';
-import { isDate } from 'util';
 
 
 export class LocalAdapter implements IAdapter {
-    private connection: redis.RedisClient;
     private tableName: string;
     private debug: boolean;
     private data: { [key: string]: { value: string, expiration?: Date } };
@@ -58,6 +54,12 @@ export class LocalAdapter implements IAdapter {
         } else {
             this.data[`${this.tableName}:${key}`] = { value };
         }
+
+        return Promise.resolve(true);
+    }
+
+    public async del(key: string): Promise<boolean> {
+        this.data[`${this.tableName}:${key}`] = undefined;
 
         return Promise.resolve(true);
     }

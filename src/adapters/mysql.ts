@@ -66,7 +66,7 @@ export class MysqlAdapter implements IAdapter {
 
             const selectQuery = `
                 SELECT \`${this.tableName}\`.value FROM \`${this.tableName}\` 
-                WHERE \`${this.tableName}\`.key = ${keyEscaped} AND expires_at > CURRENT_TIME;`;
+                WHERE \`${this.tableName}\`.key = ${keyEscaped} AND (\`${this.tableName}\`.expires_at > CURRENT_TIME OR \`${this.tableName}\`.expires_at IS NULL);`;
 
             this.maybeDebug('get', selectQuery);
 
@@ -99,6 +99,22 @@ export class MysqlAdapter implements IAdapter {
             this.maybeDebug('put', insertQuery);
 
             this.connection.query(insertQuery, (error) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                return resolve(true);
+            });
+        });
+    }
+
+    public async del(key: string): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            const keyEscaped = this.escape(key);
+
+            const deleteQuery = `DELETE FROM \`${this.tableName}\` WHERE \`${this.tableName}\`.key = ${keyEscaped};`;
+
+            this.connection.query(deleteQuery, (error) => {
                 if (error) {
                     return reject(error);
                 }

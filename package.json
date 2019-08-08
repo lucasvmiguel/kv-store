@@ -4,7 +4,13 @@
   "description": "",
   "main": "build/index.js",
   "scripts": {
-    "test": "exit 0",
+    "start-redis-for-testing": "sudo docker run --name kv-store-redis-test -d -p 6380:6379 redis",
+    "start-mysql-for-testing": "sudo docker run -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=test --name kv-store-mysql-test -d -p 3307:3306 mysql:5",
+    "end-redis-for-testing": "sudo docker kill kv-store-redis-test || true && docker rm kv-store-redis-test || true",
+    "end-mysql-for-testing": "sudo docker kill kv-store-mysql-test || true && docker rm kv-store-mysql-test || true",
+    "start-dbs": "npm run start-redis-for-testing && npm run start-mysql-for-testing && wait-port -t 30000 6380 && wait-port -t 30000 3307 && sleep 20",
+    "end-dbs": "npm run end-redis-for-testing || true && npm run end-mysql-for-testing || true",
+    "test": "npm run end-dbs && npm run start-dbs && mocha --exit -r ts-node/register src/**/*.test.ts && npm run end-dbs",
     "build": "tsc -p tsconfig.json",
     "bump:patch": "rm -rf build && npm run build && npm version patch && git push origin master",
     "bump:minor": "rm -rf build && npm run build && npm version minor && git push origin master"
@@ -25,7 +31,13 @@
     "typescript": "^3.4.3"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.7",
     "@types/mysql": "^2.15.5",
-    "@types/redis": "^2.8.13"
+    "@types/redis": "^2.8.13",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0",
+    "ts-node": "^8.3.0",
+    "wait-port": "^0.2.2"
   }
 }

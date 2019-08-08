@@ -112,6 +112,17 @@ class Client {
 
         return null;
     }
+
+    /**
+     * Delete key
+     * 
+     * @param  {string} key
+     * @returns Promise
+     */
+    public async del(key: string): Promise<Boolean> {
+        return this.adapter.del(key);
+    }
+
     /**
      * Close the connection
      * 
@@ -120,6 +131,7 @@ class Client {
     public async close(): Promise<Boolean> {
         return this.adapter.close();
     }
+
 }
 
 const client = new Client();

@@ -70,6 +70,25 @@ await kvStore.putJson('USER:456', {foo: "bar"}, { expiration: 60 });
 const fooBar = await kvStore.getJson('USER:456');
 ```
 
+#### Local
+```js
+import * as kvStore from '@lucasvmiguel/kv-store';
+
+await kvStore.init({
+  type: 'local',
+  client: null,
+  tableName: 'kvstore_keyvalues', // OPTIONAL
+  debug: false, // OPTIONAL
+});
+
+await kvStore.put('USER:123', 'abc');
+const abc = await kvStore.get('USER:123');
+
+// Expiration in seconds
+await kvStore.putJson('USER:456', {foo: "bar"}, { expiration: 60 });
+const fooBar = await kvStore.getJson('USER:456');
+```
+
 ## License
 
 [MIT](LICENSE)

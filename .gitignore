@@ -1,4 +1,4 @@
 node_modules/
-src/test.ts
+test.ts
 build/test.js
 build/test.d.ts
