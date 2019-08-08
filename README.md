@@ -94,13 +94,6 @@ const fooBar = await kvStore.getJson('USER:456');
 * expiration is in seconds
 * just pass null to init if is local cache
 
-{
-    type: ClientTypes;
-    client: Connection;
-    tableName?: string;
-    debug?: boolean;
-}
-
 ```typescript
 function init: ({
     type: 'mysql' OR 'redis' OR 'local',
