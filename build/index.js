@@ -34,6 +34,17 @@ class Client {
         });
     }
     /**
+     * Refresh the connection, this can be useful when the connection is no longer available
+     *
+     * @param  {Connection} connection
+     * @returns Promise
+     */
+    refresh(connection) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.adapter.refresh(connection);
+        });
+    }
+    /**
      * Inserts or updates a value with a key
      *
      * @param  {string} key

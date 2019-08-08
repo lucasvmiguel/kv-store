@@ -1,6 +1,7 @@
 import * as mysql from 'mysql';
 
-import { IAdapter, IOptions } from './adapter';
+import { IAdapter, IOptions, Connection } from './adapter';
+
 
 export class MysqlAdapter implements IAdapter {
     private connection: mysql.Connection;
@@ -23,8 +24,8 @@ export class MysqlAdapter implements IAdapter {
         }
     }
 
-    public async init(): Promise<Boolean> {
-        const createTableQuery = `
+    private createTableQuery(): string {
+        return `
             CREATE TABLE IF NOT EXISTS \`${this.tableName}\` (
                 \`key\` VARCHAR(255) NOT NULL,
                 \`value\` TEXT NULL,
@@ -32,17 +33,31 @@ export class MysqlAdapter implements IAdapter {
                 PRIMARY KEY (\`key\`)
             );
         `;
+    }
 
-        this.maybeDebug('init', createTableQuery);
-
-        return new Promise<Boolean>((resolve, reject) => {
-            this.connection.query(createTableQuery, (err) => {
+    private connect(): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            this.connection.query(this.createTableQuery(), (err) => {
                 if (err) {
                     return reject(err);
                 }
                 return resolve(true);
             });
         });
+    }
+
+    public async init(): Promise<boolean> {
+        this.maybeDebug('init', this.createTableQuery());
+
+        return this.connect();
+    }
+
+    public async refresh(connection: Connection): Promise<boolean> {
+        this.maybeDebug('refresh', this.createTableQuery());
+
+        this.connection = connection;
+
+        return this.connect();
     }
 
     public async get(key: string): Promise<string | null> {
@@ -69,8 +84,8 @@ export class MysqlAdapter implements IAdapter {
         });
     }
 
-    public async put(key: string, value: string, options?: IOptions): Promise<Boolean> {
-        return new Promise<Boolean>((resolve, reject) => {
+    public async put(key: string, value: string, options?: IOptions): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
             const keyEscaped = this.escape(key);
             const valueEscaped = this.escape(value);
             const expiresEscaped = options && options.expiration ? this.escape(`${options.expiration}`) : 'NULL';

@@ -1,12 +1,11 @@
-import * as mysql from 'mysql';
-import { IAdapter } from './adapters/adapter';
+import { IAdapter, Connection } from './adapters/adapter';
 import { MysqlAdapter } from './adapters/mysql';
 
 type ClientTypes = 'mysql';
 
 interface IClient {
     type: ClientTypes;
-    client: mysql.Connection;
+    client: Connection;
     tableName?: string;
     debug?: boolean;
 }
@@ -28,18 +27,27 @@ class Client {
      */
     public async init(params: IClient): Promise<Boolean> {
         this.debug = !!params.debug;
-        
+
         if (params.tableName) {
             this.tableName = params.tableName;
         }
 
         switch (params.type) {
-            case 'mysql': 
+            case 'mysql':
                 this.adapter = new MysqlAdapter(this.tableName, params.client, this.debug);
                 break;
         }
 
         return this.adapter.init();
+    }
+    /**
+     * Refresh the connection, this can be useful when the connection is no longer available
+     * 
+     * @param  {Connection} connection
+     * @returns Promise
+     */
+    public async refresh(connection: Connection): Promise<Boolean> {
+        return this.adapter.refresh(connection)
     }
 
     /**
@@ -88,7 +96,7 @@ class Client {
         const result = await this.get(key);
 
         if (result) {
-            const resultEscaped = result.replace('\r', '\\r').replace('\n', '\\n');   
+            const resultEscaped = result.replace('\r', '\\r').replace('\n', '\\n');
             return JSON.parse(resultEscaped);
         }
 

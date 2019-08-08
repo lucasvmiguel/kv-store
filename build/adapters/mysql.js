@@ -23,9 +23,8 @@ class MysqlAdapter {
             console.log('KV-STORE DEBUG', operation, query);
         }
     }
-    init() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const createTableQuery = `
+    createTableQuery() {
+        return `
             CREATE TABLE IF NOT EXISTS \`${this.tableName}\` (
                 \`key\` VARCHAR(255) NOT NULL,
                 \`value\` TEXT NULL,
@@ -33,15 +32,28 @@ class MysqlAdapter {
                 PRIMARY KEY (\`key\`)
             );
         `;
-            this.maybeDebug('init', createTableQuery);
-            return new Promise((resolve, reject) => {
-                this.connection.query(createTableQuery, (err) => {
-                    if (err) {
-                        return reject(err);
-                    }
-                    return resolve(true);
-                });
+    }
+    connect() {
+        return new Promise((resolve, reject) => {
+            this.connection.query(this.createTableQuery(), (err) => {
+                if (err) {
+                    return reject(err);
+                }
+                return resolve(true);
             });
+        });
+    }
+    init() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.maybeDebug('init', this.createTableQuery());
+            return this.connect();
+        });
+    }
+    refresh(connection) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.maybeDebug('refresh', this.createTableQuery());
+            this.connection = connection;
+            return this.connect();
         });
     }
     get(key) {

@@ -1,5 +1,5 @@
 import * as mysql from 'mysql';
-import { IAdapter, IOptions } from './adapter';
+import { IAdapter, IOptions, Connection } from './adapter';
 export declare class MysqlAdapter implements IAdapter {
     private connection;
     private tableName;
@@ -7,7 +7,10 @@ export declare class MysqlAdapter implements IAdapter {
     constructor(tableName: string, connection: mysql.Connection, debug: boolean);
     private escape;
     private maybeDebug;
-    init(): Promise<Boolean>;
+    private createTableQuery;
+    private connect;
+    init(): Promise<boolean>;
+    refresh(connection: Connection): Promise<boolean>;
     get(key: string): Promise<string | null>;
-    put(key: string, value: string, options?: IOptions): Promise<Boolean>;
+    put(key: string, value: string, options?: IOptions): Promise<boolean>;
 }

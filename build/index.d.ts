@@ -1,8 +1,8 @@
-import * as mysql from 'mysql';
+import { Connection } from './adapters/adapter';
 declare type ClientTypes = 'mysql';
 interface IClient {
     type: ClientTypes;
-    client: mysql.Connection;
+    client: Connection;
     tableName?: string;
     debug?: boolean;
 }
@@ -20,6 +20,13 @@ declare class Client {
      * @returns Promise
      */
     init(params: IClient): Promise<Boolean>;
+    /**
+     * Refresh the connection, this can be useful when the connection is no longer available
+     *
+     * @param  {Connection} connection
+     * @returns Promise
+     */
+    refresh(connection: Connection): Promise<Boolean>;
     /**
      * Inserts or updates a value with a key
      *
