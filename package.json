@@ -36,7 +36,7 @@
     "@types/mysql": "^2.15.5",
     "@types/redis": "^2.8.13",
     "chai": "^4.2.0",
-    "mocha": "^6.2.0",
+    "mocha": "^10.2.0",
     "ts-node": "^8.3.0",
     "wait-port": "^0.2.2"
   }
